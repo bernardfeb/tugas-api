@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+            font-family: Arial, sans-serif;
+            background-image: url("images/pokemon-party.jpg");
+            margin: 0;
+        }
+        #container {
+            width: 400px;
+            height: 600px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+        #searchContainer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        #pokemonInfo img {
+            width: 250px;
+            height: 250px;
+        }
+        #pokemonInfo p {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="searchContainer">
+            <input type="text" id="pokemonName" placeholder="Search Pokemon">
+            <button id="searchButton">Search</button>
+        </div>
+        <h1>Pokemon Info</h1>
+        <button id="fetchButton">Random Pokemon</button>
+        <div id="pokemonInfo"></div>
+    </div>
+
+    <script>
+        function showPokemon(data) {
+            let types = data.types.map(t => t.type.name).join(', ');
+            let abilities = data.abilities.map(a => a.ability.name).join(', ');
+
+            document.getElementById('pokemonInfo').innerHTML = `
+                <h2>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h2>
+                <img src="${data.sprites.front_default}" alt="${data.name}">
+                <p><strong>Type:</strong> ${types}</p>
+                <p><strong>Abilities:</strong> ${abilities}</p>
+            `;
+        }
+
+        document.getElementById('fetchButton').addEventListener('click', function() {
+            let id = Math.floor(Math.random() * 150) + 1;
+            fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+                .then(response => response.json())
+                .then(showPokemon);
+        });
+
+        document.getElementById('searchButton').addEventListener('click', function() {
+            let name = document.getElementById('pokemonName').value.toLowerCase().trim();
+            if (name) {
+                fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
+                    .then(response => response.json())
+                    .then(showPokemon)
+                    .catch(function() {
+                        document.getElementById('pokemonInfo').innerHTML = `<p>Pokemon not found</p>`;
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
